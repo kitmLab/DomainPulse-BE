@@ -1,0 +1,59 @@
+# .gitignore
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyo
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+venv3/
+*.venv/
+*.env/
+env/
+env3/
+*.env3/
+
+# IDE
+.idea/
+.vscode/
+
+# Compiled Files
+*.pyc
+*.pyo
+*.pyd
+
+# Logs
+*.log
+
+# Environment variables
+.env
+
+# Dependencies
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyo
+*.pyc
+*.pyo
+*.pyd
+
+# Editor directories and files
+.idea/
+.vscode/
+
+# Testing
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyo
+*.pyc
+*.pyo
+*.pyd
