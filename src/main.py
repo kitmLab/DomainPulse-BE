@@ -18,12 +18,13 @@ async def get_trends(lang: str = Query(default="jp", description="Language: jp o
 
     # クエリパラメータで指定された言語に応じて処理を行う
     if lang == "jp":
-        return trends
+        jp_trends = [{"rank": int(key), "title": value} for key, value in trends[0].items()]
+        return {"trends": jp_trends}
     elif lang == "en":
         # Googletransを使用して日本語から英語に翻訳
         translator = Translator()
-        english_trends = {str(i): {str(j): translator.translate(keyword, dest='en').text for j, keyword in trends.items()} for i, trends in trends.items()}
-        return english_trends
+        english_trends = [{"rank": int(key), "title": translator.translate(value, dest='en').text} for key, value in trends[0].items()]
+        return {"trends": english_trends}
     else:
         return {"error": "Invalid language. Please use 'jp' or 'en'."}
 
