@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Query
 from pytrends.request import TrendReq
 from googletrans import Translator
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -8,25 +9,27 @@ app = FastAPI()
 async def root():
  return {"Success!!"}
 
+class TrendItem(BaseModel):
+    rank: int
+    content: dict
+
 @app.get("/trends")
-async def get_trends(lang: str = Query(default="jp", description="Language: jp or en")):
+async def get_trends():
     # PyTrendsオブジェクトを作成
     pytrends = TrendReq(hl='en-US', tz=360)
 
     # 日本のトレンド検索キーワードを取得
     trends = pytrends.trending_searches(pn='japan')
 
-    # クエリパラメータで指定された言語に応じて処理を行う
-    if lang == "jp":
-        jp_trends = [{"rank": int(key), "title": value} for key, value in trends[0].items()]
-        return {"trends": jp_trends}
-    elif lang == "en":
-        # Googletransを使用して日本語から英語に翻訳
-        translator = Translator()
-        english_trends = [{"rank": int(key), "title": translator.translate(value, dest='en').text} for key, value in trends[0].items()]
-        return {"trends": english_trends}
-    else:
-        return {"error": "Invalid language. Please use 'jp' or 'en'."}
+    # トレンドアイテムのリストを作成
+    trend_items = []
+    for key, value in trends[0].items():
+        rank = int(key)
+        content = {"ja": value, "en": Translator().translate(value, dest='en').text}
+        trend_item = TrendItem(rank=rank, content=content)
+        trend_items.append(trend_item)
+
+    return {"trends": trend_items}
 
 if __name__ == "__main__":
     import uvicorn
