@@ -2,8 +2,13 @@ from fastapi import FastAPI, Query
 from pytrends.request import TrendReq
 from googletrans import Translator
 from pydantic import BaseModel
+from google import genai
+from dotenv import load_dotenv
+import os
 
 app = FastAPI()
+load_dotenv()
+genai_api_key = os.getenv('GENAI_API_KEY')
 
 @app.get("/")
 async def root():
@@ -111,6 +116,46 @@ async def get_trends():
         ]
 
         return {"trends": dummy_trends}
+
+class GetDomainValueRequest(BaseModel):
+    domain: str
+
+@app.get("/domains/value")
+async def get_domain_value(request: GetDomainValueRequest):
+    try:
+        client = genai.Client(api_key=genai_api_key)
+        prompt = f"""「{request.domain}」
+            このキーワードのドメインとしての価値を測定してください。
+            下記の3つの要素の答えだけをそれぞれ半角空白を入れて答えてください。
+
+            1.価値の将来性は何点か。
+            条件:0~100の間の整数で答えてください。100の方が価値があるとします。単位は必要無いです。
+
+            2.市場価値を日本円で換算した時、何円になるか。
+            条件:単位は必要無いです。桁数に応じて「,」を入れてください。
+
+            3.関連するキーワードは何か。
+            条件:日本語で答えてください。5つ答えてください。それぞれのキーワードの間に「/」を入れてください。
+
+            回答の例:
+            80 100,000 関連A/関連B/関連C/関連D/関連E"""
+        response = client.models.generate_content(model="gemini-2.0-flash", contents=prompt)
+
+        # レスポンスから結果を抽出
+        result = response.text.strip().split('\n')[0]  # 最初の行を取得
+        score, value, keywords_str = result.split(' ')
+        keywords = keywords_str.split('/')
+
+        return {
+            "score": score,
+            "value": value,
+            "keywords": keywords
+        }
+
+    except Exception as e:
+        # エラーログを出力（オプション）
+        print(f"Error fetching trends: {e}")
+        return {"score": "", "value": "", "keywords": []}
 
 if __name__ == "__main__":
     import uvicorn
