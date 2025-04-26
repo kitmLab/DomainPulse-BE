@@ -117,14 +117,11 @@ async def get_trends():
 
         return {"trends": dummy_trends}
 
-class GetDomainValueRequest(BaseModel):
-    domain: str
-
 @app.get("/domains/value")
-async def get_domain_value(request: GetDomainValueRequest):
+async def get_domain_value(word: str):
     try:
         client = genai.Client(api_key=genai_api_key)
-        prompt = f"""「{request.domain}」
+        prompt = f"""「{word}」
             このキーワードのドメインとしての価値を測定してください。
             下記の3つの要素の答えだけをそれぞれ半角空白を入れて答えてください。
 
@@ -147,7 +144,7 @@ async def get_domain_value(request: GetDomainValueRequest):
         keywords = keywords_str.split('/')
 
         return {
-            "score": score,
+            "score": int(score),
             "value": value,
             "keywords": keywords
         }
