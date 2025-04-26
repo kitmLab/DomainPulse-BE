@@ -1,9 +1,9 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI
 from pytrends.request import TrendReq
 from googletrans import Translator
 from pydantic import BaseModel
-from google import genai
 from dotenv import load_dotenv
+import google.generativeai as genai
 import os
 
 app = FastAPI()
