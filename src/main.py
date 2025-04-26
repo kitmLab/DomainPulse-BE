@@ -7,8 +7,12 @@ import google.generativeai as genai
 import os
 
 app = FastAPI()
-load_dotenv()
-genai_api_key = os.getenv('GENAI_API_KEY')
+
+SECRET_PATH = '/etc/secrets/.env'
+if os.path.exists(SECRET_PATH):
+    load_dotenv(SECRET_PATH)
+else:
+    load_dotenv()
 
 @app.get("/")
 async def root():
