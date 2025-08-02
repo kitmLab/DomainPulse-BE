@@ -3,10 +3,8 @@ from pytrends.request import TrendReq
 from googletrans import Translator
 from pydantic import BaseModel
 from dotenv import load_dotenv
-import google.generativeai as genai
+from google import genai
 import os
-
-app = FastAPI()
 
 SECRET_PATH = '/etc/secrets/.env'
 if os.path.exists(SECRET_PATH):
@@ -14,9 +12,13 @@ if os.path.exists(SECRET_PATH):
 else:
     load_dotenv()
 
+GENAI_API_KEY = os.getenv("GENAI_API_KEY")
+
+app = FastAPI()
+
 @app.get("/")
 async def root():
- return {"Success!!"}
+    return {"Success!!"}
 
 class TrendItem(BaseModel):
     rank: int
@@ -45,7 +47,7 @@ async def get_trends():
         # エラーログを出力（オプション）
         print(f"Error fetching trends: {e}")
 
-        # 代替としてのダミーデータを返す
+        # PyTrendsが動作しなくなったため代替としてのダミーデータを返す
         dummy_trends = [
             TrendItem(
                 rank=1,
@@ -124,9 +126,10 @@ async def get_trends():
 @app.get("/domains/value")
 async def get_domain_value(word: str):
     try:
-        client = genai.Client(api_key=genai_api_key)
+        client = genai.Client(api_key=GENAI_API_KEY)
         prompt = f"""「{word}」
-            このキーワードのドメインとしての価値を測定してください。
+            あなたは優秀なドメイン評価の専門家です。
+            このキーワードのドメインとしての価値を評価してください。
             下記の3つの要素の答えだけをそれぞれ半角空白を入れて答えてください。
 
             1.価値の将来性は何点か。
@@ -154,9 +157,7 @@ async def get_domain_value(word: str):
         }
 
     except Exception as e:
-        # エラーログを出力（オプション）
-        print(f"Error fetching trends: {e}")
-        return {"score": "", "value": "", "keywords": []}
+        return {"error": f"{e}"}
 
 if __name__ == "__main__":
     import uvicorn
