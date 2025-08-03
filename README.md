@@ -1,13 +1,14 @@
-# DomainPulse-BE
+# 🌐 Domain Pulse
 
-## Debugの方法
+**Domain Pulse** は、そのキーワードが「ドメイン名」としてどれほど価値があるかを評価する Web アプリケーションです。  
 
-仮想環境のアクティブ
-```
+アプリケーションの詳細は[こちら](https://github.com/kitmLab/DomainPulse-FE/blob/main/README.md)
+
+---
+
+## 🚀 開発環境のセットアップ
+
+```bash
 source .venv/bin/activate
-```
-
-ローカルで起動
-```
 uvicorn src.main:app --reload
 ```
